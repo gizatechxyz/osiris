@@ -37,7 +37,7 @@ convert(input_file='data.csv', output_file='data.cairo', input_format='csv', out
 ### CLI
 
 ```bash
-osiris convert --input_file data.csv --output_file data.cairo --input_format csv --output_format cairo
+osiris examples/preprocessed_image.npy data.cairo --input-format numpy --output-format cairo 
 ```
 
 ## Contributing

@@ -62,4 +62,5 @@ class File:
         properly terminated with a newline character.
         """
         with self.path.open("w") as f:
-            f.writelines(self.buffer)
+            for line in self.buffer:
+                f.write(f"{line}\n")

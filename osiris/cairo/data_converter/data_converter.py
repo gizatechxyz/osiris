@@ -5,7 +5,8 @@ import os
 from typing import List
 import numpy as np
 
-from osiris.cairo.file_manager.file_manager import CairoData, ModFile
+from osiris.cairo.file_manager.file import ModFile
+from osiris.cairo.file_manager.cairo_data import CairoData
 from osiris.dtypes.cairo_dtypes import Dtype
 from osiris.dtypes.cairo_impls import FixedImpl
 from osiris.cairo.data_converter.tensor_creator import create_tensor, Tensor, Sequence

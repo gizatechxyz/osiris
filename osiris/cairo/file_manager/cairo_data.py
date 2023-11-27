@@ -3,7 +3,7 @@ from osiris.cairo.file_manager.file import File
 
 class CairoData(File):
     def __init__(self, file: str):
-        super().__init__(self.path / file)  # Use pathlib's / operator
+        super().__init__(file)  # Use pathlib's / operator
 
     @classmethod
     def base_template(

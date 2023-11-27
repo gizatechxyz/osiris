@@ -47,7 +47,9 @@ def get_data_statement(data: np.ndarray, dtype: Dtype) -> list[str]:
     """
     statement_template = DataStatement[dtype.name].value
     return [
-        statement_template.format(magnitude=int(x), sign=str(x < 0).lower())
+        statement_template.replace("{magnitude}", str(int(x))).replace(
+            "{sign}", str(x < 0).lower()
+        )
         for x in data.flatten()
     ]
 
