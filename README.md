@@ -7,7 +7,7 @@ Osiris is a Python library for data conversion and management. It is designed to
 Use the package manager [Poetry](https://python-poetry.org/docs/) to install osiris.
 
 ```bash
-poetry add osiris
+poetry add giza-osiris
 ```
 
 ## Local Development
