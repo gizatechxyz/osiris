@@ -37,7 +37,7 @@ convert(input_file='data.csv', output_file='data.cairo', input_format='csv', out
 ### CLI
 
 ```bash
-osiris examples/preprocessed_image.npy data.cairo --input-format numpy --output-format cairo 
+osiris examples/preprocessed_image.npy data.cairo --input-format numpy --output-format cairo
 ```
 
 ## Contributing
@@ -49,4 +49,3 @@ Please make sure to update tests as appropriate.
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-

@@ -1,8 +1,10 @@
+from typing import List
+
+import numpy as np
+from numpy import ndarray
+
 from osiris.dtypes.cairo_dtypes import Dtype
 from osiris.dtypes.cairo_impls import FixedImpl
-from numpy import ndarray
-import numpy as np
-from typing import List
 
 # Define constants
 FP8x23_FACTOR = 2**23

@@ -1,20 +1,18 @@
 # This module convert Data source to Cairo code.
 
-from enum import Enum
 import os
-from typing import List
+
 import numpy as np
 
-from osiris.cairo.file_manager.file import ModFile
-from osiris.cairo.file_manager.cairo_data import CairoData
-from osiris.dtypes.cairo_dtypes import Dtype
-from osiris.dtypes.cairo_impls import FixedImpl
-from osiris.cairo.data_converter.tensor_creator import create_tensor, Tensor, Sequence
 from osiris.cairo.data_converter.data_statement_generator import (
     get_data_refs,
     get_data_statement,
     get_data_statement_for_sequences,
 )
+from osiris.cairo.data_converter.tensor_creator import Sequence, Tensor, create_tensor
+from osiris.cairo.file_manager.cairo_data import CairoData
+from osiris.cairo.file_manager.file import ModFile
+from osiris.dtypes.cairo_dtypes import Dtype
 
 
 def create_cairo_data(output_file: str, tensor: Tensor) -> CairoData:

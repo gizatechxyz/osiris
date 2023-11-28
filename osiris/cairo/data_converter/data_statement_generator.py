@@ -1,6 +1,8 @@
 from enum import Enum
+from typing import Sequence
+
 import numpy as np
-from typing import List, Sequence
+
 from osiris.dtypes.cairo_dtypes import Dtype
 
 

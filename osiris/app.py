@@ -1,10 +1,10 @@
-import typer
-import polars as pl
 import numpy as np
+import polars as pl
+import typer
 
-from osiris.dtypes.input_output_formats import InputFormat, OutputFormat
 from osiris.cairo.data_converter.data_converter import convert_to_cairo
 from osiris.dtypes.cairo_dtypes import Dtype
+from osiris.dtypes.input_output_formats import InputFormat, OutputFormat
 
 app = typer.Typer()
 
@@ -15,7 +15,7 @@ def convert(
     output_file: str,
     input_format: InputFormat = InputFormat.CSV,
     output_format: OutputFormat = OutputFormat.NUMPY,
-    dtype: Dtype = Dtype.I32.value,
+    dtype: Dtype = Dtype.I32,
 ):
     typer.echo("🚀 Starting the conversion process...")
     typer.echo(f"📂 Loading data from {input_file}...")
