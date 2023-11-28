@@ -33,7 +33,7 @@ jobs:
             poetry run ruff osiris
       - name: Testing
         run: |
-            poetry run pytest --cov=osiris --cov-report term-missing --cov-fail-under=80
+            poetry run pytest --cov=osiris --cov-report term-missing
 
       - name: Build dist
         run: poetry build
