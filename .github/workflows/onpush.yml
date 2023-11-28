@@ -27,7 +27,7 @@ jobs:
           poetry install
       - name: Lint with ruff
         run: |
-          poetry run ruff giza
+          poetry run ruff osiris
       - name: Testing
         run: |
-          poetry run pytest --cov=giza --cov-report term-missing --cov-fail-under=80
+          poetry run pytest --cov=osiris --cov-report term-missing --cov-fail-under=80
