@@ -15,7 +15,7 @@ poetry add giza-osiris
 To setup local development environment, clone the repository and install dependencies using Poetry.
 
 ```bash
-git clone https://github.com/yourusername/osiris.git
+git clone https://github.com/gizatechxyz/osiris.git
 cd osiris
 poetry install
 ```
