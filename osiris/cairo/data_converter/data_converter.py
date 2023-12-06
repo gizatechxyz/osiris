@@ -49,38 +49,3 @@ def convert_to_cairo(np_array: np.ndarray, output_file: str, dtype: Dtype):
     tensor = create_tensor(dtype, np_array.shape, np_array)
     cairo_data = create_cairo_data(output_file, tensor)
     cairo_data.dump()
-
-
-def inputs_gen(inputs: list[Tensor | Sequence]):
-    """
-    Generate and write Cairo file based on the provided inputs .
-
-    Args:
-        inputs (list[Tensor | list[Tensor]]): A list of input tensors or tensor sequences.
-        name (str): The name of the inputs file.
-    """
-    inputs_name = "inputs"
-
-    ModFile().update(inputs_name)
-
-    for i, input in enumerate(inputs):
-        input_data = CairoData(os.path.join(inputs_name, f"input_{i}.cairo"))
-        match input:
-            case list():
-                input_data.buffer = CairoData.sequence_template(
-                    func=f"input_{i}",
-                    dtype=input[0].dtype.value,
-                    refs=get_data_refs(input[0].dtype),
-                    data=get_data_statement_for_sequences(input, input[0].dtype),
-                    shape=[x.shape for x in input],
-                )
-            case Tensor():
-                input_data.buffer = CairoData.base_template(
-                    func=f"input_{i}",
-                    dtype=input.dtype.value,
-                    refs=get_data_refs(input.dtype),
-                    data=get_data_statement(input.data, input.dtype),
-                    shape=input.shape,
-                )
-
-        input_data.dump()

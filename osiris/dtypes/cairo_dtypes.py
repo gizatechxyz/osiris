@@ -8,3 +8,4 @@ class Dtype(Enum):
     I8 = "i8"
     I32 = "i32"
     U32 = "u32"
+    BOOL = 'bool'

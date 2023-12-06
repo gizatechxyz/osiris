@@ -28,14 +28,6 @@ def get_data_refs(dtype: Dtype) -> list[str]:
     return refs
 
 
-class DataStatement(Enum):
-    U32 = "u32"
-    I32 = "i32 { mag: {magnitude}, sign: {sign} }"
-    I8 = "i8 { mag: {magnitude}, sign: {sign} }"
-    FP8x23 = "FP8x23 { mag: {magnitude}, sign: {sign} }"
-    FP16x16 = "FP16x16 { mag: {magnitude}, sign: {sign} }"
-
-
 def get_data_statement(data: np.ndarray, dtype: Dtype) -> list[str]:
     """
     Generate data statements based on the data type.
@@ -47,13 +39,19 @@ def get_data_statement(data: np.ndarray, dtype: Dtype) -> list[str]:
     Returns:
         list[str]: The generated data statements.
     """
-    statement_template = DataStatement[dtype.name].value
-    return [
-        statement_template.replace("{magnitude}", str(int(x))).replace(
-            "{sign}", str(x < 0).lower()
-        )
-        for x in data.flatten()
-    ]
+    match dtype:
+        case Dtype.U32:
+            return [f"{int(x)}" for x in data.flatten()]
+        case Dtype.I32:
+            return ["i32 { "+f"mag: {abs(int(x))}, sign: {str(x < 0).lower()} "+"}" for x in data.flatten()]
+        case Dtype.I8:
+            return ["i8 { "+f"mag: {abs(int(x))}, sign: {str(x < 0).lower()} "+"}" for x in data.flatten()]
+        case Dtype.FP8x23:
+            return ["FP8x23 { "+f"mag: {abs(int(x))}, sign: {str(x < 0).lower()} "+"}" for x in data.flatten()]
+        case Dtype.FP16x16:
+            return ["FP16x16 { "+f"mag: {abs(int(x))}, sign: {str(x < 0).lower()} "+"}" for x in data.flatten()]
+        case Dtype.BOOL:
+            return [str(x).lower() for x in data.flatten()]
 
 
 def get_data_statement_for_sequences(data: Sequence, dtype: Dtype) -> list[list[str]]:
