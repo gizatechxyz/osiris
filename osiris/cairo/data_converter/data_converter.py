@@ -1,17 +1,14 @@
 # This module convert Data source to Cairo code.
 
-import os
 
 import numpy as np
 
 from osiris.cairo.data_converter.data_statement_generator import (
     get_data_refs,
     get_data_statement,
-    get_data_statement_for_sequences,
 )
-from osiris.cairo.data_converter.tensor_creator import Sequence, Tensor, create_tensor
+from osiris.cairo.data_converter.tensor_creator import Tensor, create_tensor
 from osiris.cairo.file_manager.cairo_data import CairoData
-from osiris.cairo.file_manager.file import ModFile
 from osiris.dtypes.cairo_dtypes import Dtype
 
 

@@ -26,13 +26,13 @@ class ModFile:
         If it doesn't, the new module statement is appended to the file.
         """
         statement = f"mod {name};"
-        if any([line.startswith(statement) for line in self.buffer]):
+        if any(line.startswith(statement) for line in self.buffer):
             # Use generator expression
             return
 
         with self.path.open("a") as f:
             f.write(f"{statement}\n")
-            
+
 
 class File:
     def __init__(self, path: str):

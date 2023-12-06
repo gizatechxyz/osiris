@@ -1,5 +1,6 @@
 from osiris.cairo.file_manager.file import File
 
+
 class CairoData(File):
     def __init__(self, file: str):
         super().__init__(file)
