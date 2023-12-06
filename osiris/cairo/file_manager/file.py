@@ -26,14 +26,13 @@ class ModFile:
         If it doesn't, the new module statement is appended to the file.
         """
         statement = f"mod {name};"
-        if any(
-            line.startswith(statement) for line in self.buffer
-        ):  # Use generator expression
+        if any([line.startswith(statement) for line in self.buffer]):
+            # Use generator expression
             return
 
         with self.path.open("a") as f:
             f.write(f"{statement}\n")
-
+            
 
 class File:
     def __init__(self, path: str):
@@ -50,7 +49,7 @@ class File:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.buffer = []
 
-        if self.path.is_file():  # Use pathlib's is_file method
+        if self.path.is_file(): # Use pathlib's is_file method
             with self.path.open("r") as f:
                 self.buffer = f.readlines()
 
@@ -62,5 +61,4 @@ class File:
         properly terminated with a newline character.
         """
         with self.path.open("w") as f:
-            for line in self.buffer:
-                f.write(f"{line}\n")
+            f.writelines([f"{line}\n" for line in self.buffer])
