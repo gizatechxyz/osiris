@@ -1,4 +1,5 @@
 import numpy as np
+import numpy as np
 
 
 class Tensor:
@@ -41,13 +42,13 @@ def create_tensor_from_array(arr: np.ndarray, fp_impl='FP16x16'):
     tensor_data = []
 
     for value in flat_array:
-        if isinstance(value, int):
+        if isinstance(value, (int, np.integer)):
             sign = 0 if value >= 0 else 1
             tensor_data.append(SignedInt(abs(value), sign))
         elif isinstance(value, float):
             (mag, sign) = to_fp(value, fp_impl)
             tensor_data.append(FixedPoint(mag, sign))
         else:
-            tensor_data.append(value)
+            raise TypeError(f"Unsupported type in tensor data: {type(value)}")
 
     return Tensor(arr.shape, tensor_data)

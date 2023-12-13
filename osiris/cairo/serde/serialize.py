@@ -1,4 +1,4 @@
-from data_structures import Tensor, SignedInt, FixedPoint
+from osiris.cairo.serde.data_structures import Tensor, SignedInt, FixedPoint
 
 
 def serializer(data) -> list[str]:
@@ -12,7 +12,7 @@ def serializer(data) -> list[str]:
             serialized_list.extend(serializer(item))
         return serialized_list
     elif isinstance(data, dict):
-        serialized_dict = [len(data)]
+        serialized_dict = [str(len(data))]
         for key, value in data.items():
             serialized_dict.extend(serializer(key))
             serialized_dict.extend(serializer(value))
