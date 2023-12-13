@@ -1,13 +1,13 @@
 from data_structures import Tensor, SignedInt, FixedPoint
 
 
-def serializer(data) -> list[int]:
+def serializer(data) -> list[str]:
     if isinstance(data, bool):
-        return [1] if data else [0]
+        return ["1"] if data else ["0"]
     elif isinstance(data, int):
-        return [data]
+        return [str(data)]
     elif isinstance(data, (list, tuple)):
-        serialized_list = [len(data)]
+        serialized_list = [str(len(data))]
         for item in data:
             serialized_list.extend(serializer(item))
         return serialized_list
@@ -22,6 +22,6 @@ def serializer(data) -> list[int]:
         serialized_tensor.extend(serializer(data.data))
         return serialized_tensor
     elif isinstance(data, (SignedInt, FixedPoint)):
-        return [data.mag, data.sign]
+        return [str(data.mag), str(data.sign)]
     else:
         raise ValueError("Unsupported data type for serialization")
