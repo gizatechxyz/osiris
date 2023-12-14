@@ -1,14 +1,15 @@
+import json
+
 import numpy as np
 import polars as pl
 import typer
-import json
 
 from osiris.cairo.data_converter.data_converter import convert_to_cairo
+from osiris.cairo.serde.data_structures import create_tensor_from_array
 from osiris.cairo.serde.deserialize import deserializer
+from osiris.cairo.serde.serialize import serializer
 from osiris.dtypes.cairo_dtypes import Dtype
 from osiris.dtypes.input_output_formats import InputFormat, OutputFormat
-from osiris.cairo.serde.serialize import serializer
-from osiris.cairo.serde.data_structures import create_tensor_from_array
 
 app = typer.Typer()
 
@@ -100,12 +101,13 @@ def deserialize(serialized: str, data_type: str, fp_impl: str = 'FP16x16'):
         serialized = json.loads(serialized)
     except json.JSONDecodeError as e:
         typer.echo(f"Error: Invalid JSON - {e}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e 
 
     deserialized = deserializer(serialized, data_type, fp_impl)
     typer.echo("✅ Deserialization completed! 🎉")
 
     return deserialized
+
 
 
 @app.command()

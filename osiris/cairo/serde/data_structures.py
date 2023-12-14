@@ -1,7 +1,7 @@
 import numpy as np
-import numpy as np
 
 from .utils import to_fp
+
 
 class Tensor:
     def __init__(self, shape: tuple, data):

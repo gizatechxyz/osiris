@@ -1,4 +1,4 @@
-from osiris.cairo.serde.data_structures import Tensor, SignedInt, FixedPoint
+from osiris.cairo.serde.data_structures import FixedPoint, SignedInt, Tensor
 
 
 def serializer(data) -> list[str]:
