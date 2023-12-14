@@ -14,6 +14,16 @@ app = typer.Typer()
 
 
 def load_data(input_file: str, input_format: InputFormat):
+    """
+    Load data from a file into a DataFrame or numpy array.
+
+    Args:
+    input_file (str): The path to the input file.
+    input_format (InputFormat): The format of the input file (e.g., CSV, PARQUET, NUMPY).
+
+    Returns:
+    DataFrame or numpy array: The loaded data.
+    """
     typer.echo(f"📂 Loading data from {input_file}...")
     match input_format:
         case InputFormat.CSV:
@@ -27,6 +37,15 @@ def load_data(input_file: str, input_format: InputFormat):
 
 
 def convert_to_numpy(data):
+    """
+    Convert the given data to a numpy array.
+
+    Args:
+    data: Data to be converted. Can be a DataFrame or numpy array.
+
+    Returns:
+    numpy array: The converted data.
+    """
     if not isinstance(data, np.ndarray):
         typer.echo("🔄 Converting data to numpy...")
         return data.to_numpy()
@@ -35,6 +54,17 @@ def convert_to_numpy(data):
 
 @app.command()
 def serialize(input_file: str, input_format: InputFormat = InputFormat.CSV, fp_impl: str = 'FP16x16'):
+    """
+    Serialize data from a file to a tensor representation.
+
+    Args:
+    input_file (str): The path to the input file.
+    input_format (InputFormat): The format of the input file.
+    fp_impl (str): Fixed-point implementation detail.
+
+    Returns:
+    Serialized tensor.
+    """
     typer.echo("🚀 Starting the conversion process...")
     data = load_data(input_file, input_format)
     typer.echo("✅ Data loaded successfully!")
@@ -53,6 +83,17 @@ def serialize(input_file: str, input_format: InputFormat = InputFormat.CSV, fp_i
 
 @app.command()
 def deserialize(serialized: str, data_type: str, fp_impl: str = 'FP16x16'):
+    """
+    Deserialize a serialized string into a specific data type.
+
+    Args:
+    serialized (str): Serialized data in string format.
+    data_type (str): The type of data to deserialize into.
+    fp_impl (str): Fixed-point implementation detail.
+
+    Returns:
+    Deserialized data.
+    """
     typer.echo("🚀 Starting deserialization process...")
 
     try:
@@ -69,6 +110,17 @@ def deserialize(serialized: str, data_type: str, fp_impl: str = 'FP16x16'):
 
 @app.command()
 def convert(input_file: str, output_file: str, input_format: InputFormat = InputFormat.CSV, output_format: OutputFormat = OutputFormat.NUMPY, dtype: Dtype = Dtype.I32):
+    """
+    Convert data from one format to another.
+
+    Args:
+    input_file (str): The path to the input file.
+    output_file (str): The path for the output file.
+    input_format (InputFormat): The format of the input file.
+    output_format (OutputFormat): The format for the output file.
+    dtype (Dtype): Data type for Cairo conversion.
+
+    """
     typer.echo("🚀 Starting the conversion process...")
     data = load_data(input_file, input_format)
     typer.echo("✅ Data loaded successfully!")
