@@ -1,6 +1,7 @@
 import numpy as np
 import numpy as np
 
+from .utils import to_fp
 
 class Tensor:
     def __init__(self, shape: tuple, data):
@@ -18,20 +19,6 @@ class FixedPoint:
     def __init__(self, mag, sign):
         self.mag = mag
         self.sign = sign
-
-
-def to_fp(value, fp_impl='FP32x32'):
-    sign = 0 if value >= 0 else 1
-
-    match fp_impl:
-        case 'FP16x16':
-            return (abs(int(value * 2**16)), sign)
-        case 'FP8x23':
-            return (abs(int(value * 2**23)), sign)
-        case 'FP32x32':
-            return (abs(int(value * 2**32)), sign)
-        case 'FP64x64':
-            return (abs(int(value * 2**64)), sign)
 
 
 def create_tensor_from_array(arr: np.ndarray, fp_impl='FP16x16'):

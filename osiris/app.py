@@ -1,8 +1,10 @@
 import numpy as np
 import polars as pl
 import typer
+import json
 
 from osiris.cairo.data_converter.data_converter import convert_to_cairo
+from osiris.cairo.serde.deserialize import deserializer
 from osiris.dtypes.cairo_dtypes import Dtype
 from osiris.dtypes.input_output_formats import InputFormat, OutputFormat
 from osiris.cairo.serde.serialize import serializer
@@ -47,6 +49,22 @@ def serialize(input_file: str, input_format: InputFormat = InputFormat.CSV, fp_i
     typer.echo("✅ Serialized tensor successfully! 🎉")
 
     return serialized
+
+
+@app.command()
+def deserialize(serialized: str, data_type: str, fp_impl: str = 'FP16x16'):
+    typer.echo("🚀 Starting deserialization process...")
+
+    try:
+        serialized = json.loads(serialized)
+    except json.JSONDecodeError as e:
+        typer.echo(f"Error: Invalid JSON - {e}")
+        raise typer.Exit(code=1)
+
+    deserialized = deserializer(serialized, data_type, fp_impl)
+    typer.echo("✅ Deserialization completed! 🎉")
+
+    return deserialized
 
 
 @app.command()
