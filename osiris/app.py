@@ -1,4 +1,5 @@
 import json
+import os
 
 import numpy as np
 import polars as pl
@@ -14,18 +15,32 @@ from osiris.dtypes.input_output_formats import InputFormat, OutputFormat
 app = typer.Typer()
 
 
-def load_data(input_file: str, input_format: InputFormat):
+def check_file_format(file_path):
+    _, file_extension = os.path.splitext(file_path)
+
+    if file_extension in ['.csv']:
+        return 'CSV'
+    elif file_extension in ['.parquet']:
+        return 'Parquet'
+    elif file_extension in ['.npy']:
+        return 'NumPy'
+    else:
+        return 'Unknown'
+
+
+def load_data(input_file: str):
     """
     Load data from a file into a DataFrame or numpy array.
 
     Args:
     input_file (str): The path to the input file.
-    input_format (InputFormat): The format of the input file (e.g., CSV, PARQUET, NUMPY).
 
     Returns:
     DataFrame or numpy array: The loaded data.
     """
     typer.echo(f"📂 Loading data from {input_file}...")
+
+    input_format = check_file_format(input_file)
     match input_format:
         case InputFormat.CSV:
             return pl.read_csv(input_file)
@@ -54,20 +69,20 @@ def convert_to_numpy(data):
 
 
 @app.command()
-def serialize(input_file: str, input_format: InputFormat = InputFormat.CSV, fp_impl: str = 'FP16x16'):
+def serialize(input_file: str, fp_impl: str = 'FP16x16'):
     """
     Serialize data from a file to a tensor representation.
 
     Args:
     input_file (str): The path to the input file.
-    input_format (InputFormat): The format of the input file.
     fp_impl (str): Fixed-point implementation detail.
 
     Returns:
     Serialized tensor.
     """
+
     typer.echo("🚀 Starting the conversion process...")
-    data = load_data(input_file, input_format)
+    data = load_data(input_file)
     typer.echo("✅ Data loaded successfully!")
 
     numpy_array = convert_to_numpy(data)
@@ -109,22 +124,20 @@ def deserialize(serialized: str, data_type: str, fp_impl: str = 'FP16x16'):
     return deserialized
 
 
-
 @app.command()
-def convert(input_file: str, output_file: str, input_format: InputFormat = InputFormat.CSV, output_format: OutputFormat = OutputFormat.NUMPY, dtype: Dtype = Dtype.I32):
+def convert(input_file: str, output_file: str, output_format: OutputFormat = OutputFormat.NUMPY, dtype: Dtype = Dtype.I32):
     """
     Convert data from one format to another.
 
     Args:
     input_file (str): The path to the input file.
     output_file (str): The path for the output file.
-    input_format (InputFormat): The format of the input file.
     output_format (OutputFormat): The format for the output file.
     dtype (Dtype): Data type for Cairo conversion.
 
     """
     typer.echo("🚀 Starting the conversion process...")
-    data = load_data(input_file, input_format)
+    data = load_data(input_file)
     typer.echo("✅ Data loaded successfully!")
 
     numpy_array = convert_to_numpy(data)
