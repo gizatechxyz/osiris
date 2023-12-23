@@ -29,7 +29,9 @@ def create_tensor_from_array(arr: np.ndarray, fp_impl='FP16x16'):
     tensor_data = []
 
     for value in flat_array:
-        if isinstance(value, (int, np.integer, np.signedinteger)):
+        if isinstance(value, (np.unsignedinteger)):
+            tensor_data.append(value)
+        elif isinstance(value, (int, np.integer, np.signedinteger)):
             sign = 0 if value >= 0 else 1
             tensor_data.append(SignedInt(abs(value), sign))
         elif isinstance(value, (float, np.floating)):
