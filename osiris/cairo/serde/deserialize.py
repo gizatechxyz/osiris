@@ -12,7 +12,9 @@ def deserializer(serialized: list, data_type: str, fp_impl='FP16x16'):
     :param fp_impl: The implementation detail, used for fixed-point deserialization.
     :return: The deserialized data.
     """
-    if data_type == 'signed_int':
+    if data_type == 'unsigned_int':
+        return deserialize_unsigned_int(serialized)
+    elif data_type == 'signed_int':
         return deserialize_signed_int(serialized)
     elif data_type == 'fixed_point':
         return deserialize_fixed_point(serialized, fp_impl)
@@ -42,6 +44,13 @@ def deserializer(serialized: list, data_type: str, fp_impl='FP16x16'):
         return deserialize_tuple_tensor_fixed_point(serialized, fp_impl)
     else:
         raise ValueError(f"Unknown data type: {data_type}")
+
+# ================= UNSIGNED INT =================
+
+
+def deserialize_unsigned_int(serialized: list) -> np.int64:
+    return np.int64(serialized[0])
+
 
 # ================= SIGNED INT =================
 
