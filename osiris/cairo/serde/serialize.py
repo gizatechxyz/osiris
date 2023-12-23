@@ -1,4 +1,4 @@
-from osiris.cairo.serde.data_structures import FixedPoint, SignedInt, Tensor
+from osiris.cairo.serde.data_structures import FixedPoint, SignedInt, Tensor, UnsignedInt
 
 
 def serializer(data) -> list[str]:
@@ -23,5 +23,8 @@ def serializer(data) -> list[str]:
         return serialized_tensor
     elif isinstance(data, (SignedInt, FixedPoint)):
         return [str(data.mag), str(data.sign)]
+    elif isinstance(data, UnsignedInt):
+        return [str(data.mag)]
+
     else:
         raise ValueError("Unsupported data type for serialization")

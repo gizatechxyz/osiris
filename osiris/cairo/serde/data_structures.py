@@ -8,6 +8,9 @@ class Tensor:
         self.shape = shape
         self.data = data
 
+class UnsignedInt:
+    def __init__(self, mag):
+        self.mag = mag
 
 class SignedInt:
     def __init__(self, mag, sign):
@@ -30,7 +33,7 @@ def create_tensor_from_array(arr: np.ndarray, fp_impl='FP16x16'):
 
     for value in flat_array:
         if isinstance(value, (np.unsignedinteger)):
-            tensor_data.append(value)
+            tensor_data.append(UnsignedInt(value))
         elif isinstance(value, (int, np.integer, np.signedinteger)):
             sign = 0 if value >= 0 else 1
             tensor_data.append(SignedInt(abs(value), sign))

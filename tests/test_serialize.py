@@ -25,8 +25,15 @@ def test_create_tensor_from_array_with_invalid_input():
         create_tensor_from_array("not a numpy array")
 
 
-def test_serializer_for_tensor():
+def test_serializer_for_tensor_signedint():
     arr = np.array([[1, 2], [3, 4]], dtype=np.int64)
+    tensor = create_tensor_from_array(arr)
+    serialized_data = serializer(tensor)
+    assert isinstance(serialized_data, list)
+
+
+def test_serializer_for_tensor_uint():
+    arr = np.array([[1, 2], [3, 4]], dtype=np.uint64)
     tensor = create_tensor_from_array(arr)
     serialized_data = serializer(tensor)
     assert isinstance(serialized_data, list)
