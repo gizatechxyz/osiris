@@ -6,62 +6,61 @@ from osiris.cairo.serde.deserialize import *
 
 
 def test_deserialize_signed_int():
-    serialized = [42, 0]
-    deserialized = deserialize_signed_int(serialized)
+    serialized = '[{"Int":"2A"}, {"Int":"0"}]'
+    deserialized = deserializer(serialized, 'signed_int')
     assert deserialized == 42
 
-    serialized = [42, 1]
-    deserialized = deserialize_signed_int(serialized)
+    serialized = '[{"Int":"2A"}, {"Int":"0x1"}]'
+    deserialized = deserializer(serialized, 'signed_int')
     assert deserialized == -42
 
 
-def test_deserialize_signed_int():
-    serialized = [2780037, 0]
-    deserialized = deserialize_fixed_point(serialized, 'FP16x16')
+def test_deserialize_fp():
+    serialized = '[{"Int":"2A6B85"}, {"Int":"0"}]'
+    deserialized = deserializer(serialized, 'fixed_point', 'FP16x16')
     assert isclose(deserialized, 42.42, rel_tol=1e-7)
 
-    serialized = [2780037, 1]
-    deserialized = deserialize_fixed_point(serialized, 'FP16x16')
+    serialized = '[{"Int":"2A6B85"}, {"Int":"1"}]'
+    deserialized = deserializer(serialized, 'fixed_point', 'FP16x16')
     assert isclose(deserialized, -42.42, rel_tol=1e-7)
 
 
 def test_deserialize_array_uint():
-    serialized = [[1, 2]]
-    deserialized = deserialize_arr_uint(serialized)
+    serialized = '[{"Array": [{"Int": "0x1"}, {"Int": "0x2"}]}]'
+    deserialized = deserializer(serialized, 'arr_uint')
     assert np.array_equal(deserialized, np.array([1, 2], dtype=np.int64))
 
 
 def test_deserialize_array_signed_int():
-    serialized = [[42, 0, 42, 1]]
-    deserialized = deserialize_arr_signed_int(serialized)
+    serialized = '[{"Array": [{"Int": "2A"}, {"Int": "0"}, {"Int": "2A"}, {"Int": "0x1"}]}]'
+    deserialized = deserializer(serialized, 'arr_signed_int')
     assert np.array_equal(deserialized, np.array([42, -42], dtype=np.int64))
 
 
 def test_deserialize_arr_fixed_point():
-    serialized = [[2780037, 0, 2780037, 1]]
-    deserialized = deserialize_arr_fixed_point(serialized)
+    serialized = '[{"Array": [{"Int": "2A6B85"}, {"Int": "0"}, {"Int": "2A6B85"}, {"Int": "0x1"}]}]'
+    deserialized = deserializer(serialized, 'arr_fixed_point')
     expected = np.array([42.42, -42.42], dtype=np.float64)
     assert np.all(np.isclose(deserialized, expected, atol=1e-7))
 
 
 def test_deserialize_tensor_uint():
-    serialized = [[2, 2], [1, 2, 3, 4]]
-    deserialized = deserialize_tensor_uint(serialized)
+    serialized = '[{"Array": [{"Int": "0x2"}, {"Int": "0x2"}]}, {"Array": [{"Int": "0x1"}, {"Int": "0x2"}, {"Int": "0x3"}, {"Int": "0x4"}]}]'
+    deserialized = deserializer(serialized, 'tensor_uint')
     assert np.array_equal(deserialized, np.array(
         ([1, 2], [3, 4]), dtype=np.int64))
 
 
 def test_deserialize_tensor_signed_int():
-    serialized_tensor = [[2, 2], [42, 0, 42, 0, 42, 1, 42, 1]]
-    deserialized = deserialize_tensor_signed_int(serialized_tensor)
+    serialized = '[{"Array": [{"Int": "0x2"}, {"Int": "0x2"}]}, {"Array": [{"Int": "2A"}, {"Int": "0x0"}, {"Int": "2A"}, {"Int": "0x0"}, {"Int": "2A"}, {"Int": "0x1"}, {"Int": "2A"}, {"Int": "0x1"}]}]'
+    deserialized = deserializer(serialized, 'tensor_signed_int')
     assert np.array_equal(deserialized, np.array([[42, 42], [-42, -42]]))
 
 
 def test_deserialize_tensor_fixed_point():
-    serialized_tensor = [[2, 2], [2780037,
-                         0, 2780037, 0, 2780037, 1, 2780037, 1]]
+    serialized = '[{"Array": [{"Int": "0x2"}, {"Int": "0x2"}]}, {"Array": [{"Int": "2A6B85"}, {"Int": "0x0"}, {"Int": "2A6B85"}, {"Int": "0x0"}, {"Int": "2A6B85"}, {"Int": "0x1"}, {"Int": "2A6B85"}, {"Int": "0x1"}]}]'
     expected_array = np.array([[42.42, 42.42], [-42.42, -42.42]])
-    deserialized = deserialize_tensor_fixed_point(serialized_tensor)
+    deserialized = deserializer(serialized, 'tensor_fixed_point')
     assert np.allclose(deserialized, expected_array, atol=1e-7)
 
 

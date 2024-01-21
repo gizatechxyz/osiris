@@ -1,14 +1,10 @@
-<<<<<<< Updated upstream
-=======
 import json
-
->>>>>>> Stashed changes
 import numpy as np
 
 from .utils import from_fp
 
 
-def deserializer(serialized: list, data_type: str, fp_impl='FP16x16'):
+def deserializer(serialized: str, data_type: str, fp_impl='FP16x16'):
     """
     Main deserialization function that handles various data types.
 
@@ -17,6 +13,9 @@ def deserializer(serialized: list, data_type: str, fp_impl='FP16x16'):
     :param fp_impl: The implementation detail, used for fixed-point deserialization.
     :return: The deserialized data.
     """
+
+    serialized = convert_data(serialized)
+
     if data_type == 'unsigned_int':
         return deserialize_unsigned_int(serialized)
     elif data_type == 'signed_int':
@@ -33,6 +32,8 @@ def deserializer(serialized: list, data_type: str, fp_impl='FP16x16'):
         return deserialize_tensor_uint(serialized)
     elif data_type == 'tensor_signed_int':
         return deserialize_tensor_signed_int(serialized)
+    elif data_type == 'tensor_fixed_point':
+        return deserialize_tensor_fixed_point(serialized)
     # TODO: Support Tuples
     # elif data_type == 'tensor_fixed_point':
     #     return deserialize_tensor_fixed_point(serialized, fp_impl)
@@ -50,6 +51,40 @@ def deserializer(serialized: list, data_type: str, fp_impl='FP16x16'):
     #     return deserialize_tuple_tensor_fixed_point(serialized, fp_impl)
     else:
         raise ValueError(f"Unknown data type: {data_type}")
+
+
+def parse_return_value(return_value):
+    """
+    Parse a ReturnValue dictionary to extract the integer value or recursively parse an array of ReturnValues (cf: OrionRunner ReturnValues).
+    """
+    if 'Int' in return_value:
+        # Convert hexadecimal string to integer
+        return int(return_value['Int'], 16)
+    elif 'Array' in return_value:
+        # Recursively parse each item in the array
+        return [parse_return_value(item) for item in return_value['Array']]
+    else:
+        raise ValueError("Invalid ReturnValue format")
+
+
+def convert_data(data):
+    """
+    Convert the given JSON-like data structure to the desired format.
+    """
+    parsed_data = json.loads(data)
+    result = []
+    for item in parsed_data:
+        # Parse each item based on its keys
+        if 'Array' in item:
+            # Process array items
+            result.append(parse_return_value(item))
+        elif 'Int' in item:
+            # Process single int items
+            result.append(parse_return_value(item))
+        else:
+            raise ValueError("Invalid data format")
+    return result
+
 
 # ================= UNSIGNED INT =================
 
