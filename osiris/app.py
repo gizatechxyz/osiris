@@ -112,12 +112,6 @@ def deserialize(serialized: str, data_type: str, fp_impl: str = 'FP16x16'):
     """
     typer.echo("🚀 Starting deserialization process...")
 
-    try:
-        serialized = json.loads(serialized)
-    except json.JSONDecodeError as e:
-        typer.echo(f"Error: Invalid JSON - {e}")
-        raise typer.Exit(code=1) from e
-
     deserialized = deserializer(serialized, data_type, fp_impl)
     typer.echo("✅ Deserialization completed! 🎉")
 
