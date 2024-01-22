@@ -1,7 +1,7 @@
 from osiris.cairo.serde.data_structures import (
     FixedPoint,
-    Tensor,
     Int,
+    Tensor,
 )
 from osiris.cairo.serde.utils import int_to_felt
 
