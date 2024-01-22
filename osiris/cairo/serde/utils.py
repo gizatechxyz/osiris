@@ -22,3 +22,19 @@ def from_fp(value, fp_impl='FP16x16'):
             return value / 2**32
         case 'FP64x64':
             return value / 2**64
+
+def int_to_felt(n):
+    PRIME_FIELD = 2**251 + 17 * 2**192 + 1
+    if n < 0:
+        return (PRIME_FIELD + n) % PRIME_FIELD
+    else:
+        return n % PRIME_FIELD
+
+def felt_to_int(felt):
+    PRIME_FIELD = 2**251 + 17 * 2**192 + 1
+    HALF_FIELD = PRIME_FIELD // 2
+
+    if felt > HALF_FIELD:
+        return felt - PRIME_FIELD
+    else:
+        return felt
