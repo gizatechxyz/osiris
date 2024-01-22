@@ -1,7 +1,11 @@
 import os
 
 import numpy as np
+<<<<<<< Updated upstream
 import polars as pl
+=======
+import pandas as pd
+>>>>>>> Stashed changes
 import typer
 
 from osiris.cairo.data_converter.data_converter import convert_to_cairo
@@ -13,7 +17,10 @@ from osiris.dtypes.input_output_formats import InputFormat, OutputFormat
 
 app = typer.Typer()
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 def check_file_format(file_path):
     _, file_extension = os.path.splitext(file_path)
 
