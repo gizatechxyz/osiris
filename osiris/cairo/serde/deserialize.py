@@ -2,7 +2,7 @@ import json
 
 import numpy as np
 
-from .utils import from_fp
+from .utils import felt_to_int, from_fp
 
 
 def deserializer(serialized: str, data_type: str, fp_impl='FP16x16'):
@@ -17,22 +17,16 @@ def deserializer(serialized: str, data_type: str, fp_impl='FP16x16'):
 
     serialized = convert_data(serialized)
 
-    if data_type == 'unsigned_int':
-        return deserialize_unsigned_int(serialized)
-    elif data_type == 'signed_int':
-        return deserialize_signed_int(serialized)
+    if data_type == 'int':
+        return deserialize_int(serialized)
     elif data_type == 'fixed_point':
         return deserialize_fixed_point(serialized, fp_impl)
-    elif data_type == 'arr_uint':
-        return deserialize_arr_uint(serialized)
-    elif data_type == 'arr_signed_int':
-        return deserialize_arr_signed_int(serialized)
+    elif data_type == 'arr_int':
+        return deserialize_arr_int(serialized)
     elif data_type == 'arr_fixed_point':
         return deserialize_arr_fixed_point(serialized, fp_impl)
-    elif data_type == 'tensor_uint':
-        return deserialize_tensor_uint(serialized)
-    elif data_type == 'tensor_signed_int':
-        return deserialize_tensor_signed_int(serialized)
+    elif data_type == 'tensor_int':
+        return deserialize_tensor_int(serialized)
     elif data_type == 'tensor_fixed_point':
         return deserialize_tensor_fixed_point(serialized)
     # TODO: Support Tuples
@@ -87,22 +81,12 @@ def convert_data(data):
     return result
 
 
-# ================= UNSIGNED INT =================
+# ================= INT =================
 
 
-def deserialize_unsigned_int(serialized: list) -> np.int64:
-    return np.int64(serialized[0])
+def deserialize_int(serialized: list) -> np.int64:
+    return np.int64(felt_to_int(serialized[0]))
 
-
-# ================= SIGNED INT =================
-
-
-def deserialize_signed_int(serialized: list) -> np.int64:
-    serialized_mag = serialized[0]
-    serialized_sign = serialized[1]
-
-    deserialized = serialized_mag if serialized_sign == 0 else -serialized_mag
-    return np.int64(deserialized)
 
 # ================= FIXED POINT =================
 
@@ -114,31 +98,17 @@ def deserialize_fixed_point(serialized: list, impl='FP16x16') -> np.float64:
     deserialized = serialized_mag if serialized_sign == 0 else -serialized_mag
     return np.float64(deserialized)
 
-# ================= ARRAY UINT =================
+
+# ================= ARRAY INT =================
 
 
-def deserialize_arr_uint(serialized: list) -> np.array:
-    return np.array(serialized[0], dtype=np.int64)
-
-# ================= ARRAY SIGNED INT =================
-
-
-def deserialize_arr_signed_int(serialized):
+def deserialize_arr_int(serialized):
 
     serialized = serialized[0]
 
-    if len(serialized) % 2 != 0:
-        raise ValueError("Array length must be even")
-
     deserialized = []
-    for i in range(0, len(serialized), 2):
-        mag = serialized[i]
-        sign = serialized[i + 1]
-
-        if sign == 1:
-            mag = -mag
-
-        deserialized.append(mag)
+    for ele in serialized:
+        deserialized.append(felt_to_int(ele))
 
     return np.array(deserialized)
 
@@ -162,21 +132,12 @@ def deserialize_arr_fixed_point(serialized: list, impl='FP16x16'):
     return np.array(deserialized)
 
 
-# ================= TENSOR UINT =================
+# ================= TENSOR INT =================
 
 
-def deserialize_tensor_uint(serialized: list) -> np.array:
+def deserialize_tensor_int(serialized: list) -> np.array:
     shape = serialized[0]
-    data = serialized[1]
-
-    return np.array(data, dtype=np.int64).reshape(shape)
-
-# ================= TENSOR SIGNED INT =================
-
-
-def deserialize_tensor_signed_int(serialized: list) -> np.array:
-    shape = serialized[0]
-    data = deserialize_arr_signed_int([serialized[1]])
+    data = deserialize_arr_int([serialized[1]])
 
     return np.array(data, dtype=np.int64).reshape(shape)
 
