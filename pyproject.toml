@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "giza-osiris"
-version = "0.1.8"
+version = "0.1.9"
 description = "Osiris is a Python library designed for efficient data conversion and management, primarily transforming data into Cairo programs"
 authors = ["Fran Algaba <fran@gizatech.xyz>"]
 readme = "README.md"
