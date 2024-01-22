@@ -1,11 +1,7 @@
 import os
 
 import numpy as np
-<<<<<<< Updated upstream
-import polars as pl
-=======
 import pandas as pd
->>>>>>> Stashed changes
 import typer
 
 from osiris.cairo.data_converter.data_converter import convert_to_cairo
@@ -17,21 +13,17 @@ from osiris.dtypes.input_output_formats import InputFormat, OutputFormat
 
 app = typer.Typer()
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 def check_file_format(file_path):
     _, file_extension = os.path.splitext(file_path)
 
-    if file_extension in ['.csv']:
-        return 'CSV'
-    elif file_extension in ['.parquet']:
-        return 'Parquet'
-    elif file_extension in ['.npy']:
-        return 'NumPy'
+    if file_extension == '.csv':
+        return InputFormat.CSV
+    elif file_extension == '.parquet':
+        return InputFormat.PARQUET
+    elif file_extension == '.npy':
+        return InputFormat.NUMPY
     else:
-        return 'Unknown'
+        return InputFormat.UNKNOWN
 
 
 def load_data(input_file: str):
@@ -49,13 +41,13 @@ def load_data(input_file: str):
     input_format = check_file_format(input_file)
     match input_format:
         case InputFormat.CSV:
-            return pl.read_csv(input_file)
+            return pd.read_csv(input_file, header=None)
         case InputFormat.PARQUET:
-            return pl.read_parquet(input_file)
+            return pd.read_parquet(input_file)
         case InputFormat.NUMPY:
             return np.load(input_file)
         case _:
-            raise ValueError(f"Unsupported input format: {input_format}")
+            raise ValueError(f"Unsupported input format: {input_format.value}")
 
 
 def convert_to_numpy(data):
