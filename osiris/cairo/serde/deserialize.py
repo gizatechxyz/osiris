@@ -1,9 +1,40 @@
 import json
+import re
 
 import numpy as np
 
 from .utils import felt_to_int, from_fp
 
+
+
+def deserializer2(serialized: str, dtype: int):
+    serialized = convert_data(serialized)
+
+    if dtype in ("u8", "u16", "u32", "u64", "u128", "i8", "i16", "i32", "i64", "i128"):
+        return deserialize_int(serialized)
+    elif dtype == "FP16x16":
+        return deserialize_fixed_point(serialized, "FP16x16")
+    elif dtype == "FP8x23":
+        return deserialize_fixed_point(serialized, "FP8x23")
+    elif dtype == "FP32x32":
+        return deserialize_fixed_point(serialized, "FP32x32")
+    elif dtype == "FP64x64":
+        return deserialize_fixed_point(serialized, "FP64x64")
+    elif dtype.startswith("Span<") and dtype.endswith(">"):
+        # Extract the inner type from the Span
+        inner_type = dtype[5:-1]
+        if inner_type.startswith("FP"):
+            return deserialize_arr_fixed_point(serialized, inner_type)
+        else:
+            return deserialize_arr_int(serialized)
+    elif dtype.startswith("Tensor<") and dtype.endswith(">"):
+        # Extract the inner type from the Tensor
+        inner_type = dtype[7:-1]
+        if inner_type.startswith("FP"):
+            return deserialize_tensor_fixed_point(serialized)
+        else: 
+            return deserialize_tensor_int(serialized)
+    pass
 
 def deserializer(serialized: str, data_type: str, fp_impl='FP16x16'):
     """
