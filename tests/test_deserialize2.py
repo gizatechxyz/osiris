@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.testing as npt
 import pytest
 from math import isclose
 
@@ -59,15 +60,25 @@ def test_deserialize_tensor_fixed_point():
     deserialized = deserializer2(serialized, 'Tensor<FP16x16>')
     assert np.allclose(deserialized, expected_array, atol=1e-7)
 
-# def test_deserialize_tuple_int():
-#     serialized = '[{"Int":"0x1"},{"Int":"0x3"}]'
-#     deserialized = deserializer2(serialized, '(u32, u32)')
-#     assert deserialized == (1,3)
 
-# def test_deserialize_tuple_uint():
-#     serialized = [1, 2]
-#     deserialized = deserialize_tuple_uint(serialized)
-#     assert np.array_equal(deserialized, np.array([1, 2], dtype=np.int64))
+def test_deserialize_tuple_int():
+    serialized = '[{"Int":"0x1"},{"Int":"0x3"}]'
+    deserialized = deserializer2(serialized, '(u32, u32)')
+    assert deserialized == (1, 3)
+
+
+def test_deserialize_tuple_span():
+    serialized = '[{"Array":[{"Int":"0x1"},{"Int":"0x2"}]},{"Int":"0x3"}]'
+    deserialized = deserializer2(serialized, '(Span<u32>, u32)')
+    expected = (np.array([1, 2]), 3)
+    npt.assert_array_equal(deserialized[0], expected[0])
+    assert deserialized[1] == expected[1]
+
+
+def test_deserialize_tuple_span_tensor_fp():
+    serialized = '[{"Array":[{"Int":"0x1"},{"Int":"0x2"}]},{"Array":[{"Int":"0x1"},{"Int":"0x2"}]},{"Array":[{"Int":"0x2a0000"},{"Int":"0x0"},{"Int":"0x2a0000"},{"Int":"0x1"}]}]'
+    deserialized = deserializer2(serialized, '(Span<u32>, Tensor<FP16x16>)')
+    
 
 
 # def test_deserialize_tuple_signed_int():

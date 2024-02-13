@@ -7,34 +7,49 @@ from .utils import felt_to_int, from_fp
 
 
 
-def deserializer2(serialized: str, dtype: int):
-    serialized = convert_data(serialized)
+def deserializer2(serialized: str, dtype: str):
+    # Check if the serialized data is a string and needs conversion
+    if isinstance(serialized, str):
+        serialized = convert_data(serialized)
 
-    if dtype in ("u8", "u16", "u32", "u64", "u128", "i8", "i16", "i32", "i64", "i128"):
-        return deserialize_int(serialized)
-    elif dtype == "FP16x16":
-        return deserialize_fixed_point(serialized, "FP16x16")
-    elif dtype == "FP8x23":
-        return deserialize_fixed_point(serialized, "FP8x23")
-    elif dtype == "FP32x32":
-        return deserialize_fixed_point(serialized, "FP32x32")
-    elif dtype == "FP64x64":
-        return deserialize_fixed_point(serialized, "FP64x64")
-    elif dtype.startswith("Span<") and dtype.endswith(">"):
-        # Extract the inner type from the Span
-        inner_type = dtype[5:-1]
-        if inner_type.startswith("FP"):
-            return deserialize_arr_fixed_point(serialized, inner_type)
+    # Function to deserialize individual elements within a tuple
+    def deserialize_element(element, element_type):
+        if element_type in ("u8", "u16", "u32", "u64", "u128", "i8", "i16", "i32", "i64", "i128"):
+            return deserialize_int(element)
+        elif element_type.startswith("FP"):
+            return deserialize_fixed_point(element, element_type)
+        elif element_type.startswith("Span<") and element_type.endswith(">"):
+            inner_type = element_type[5:-1]
+            if inner_type.startswith("FP"):
+                return deserialize_arr_fixed_point(element, inner_type)
+            else:
+                return deserialize_arr_int(element)
+        elif element_type.startswith("Tensor<") and element_type.endswith(">"):
+            inner_type = element_type[7:-1]
+            if inner_type.startswith("FP"):
+                return deserialize_tensor_fixed_point(element, inner_type)
+            else:
+                return deserialize_tensor_int(element)
+        elif element_type.startswith("(") and element_type.endswith(")"):
+            return deserializer2(element, element_type)  # Recursive call for nested tuples
         else:
-            return deserialize_arr_int(serialized)
-    elif dtype.startswith("Tensor<") and dtype.endswith(">"):
-        # Extract the inner type from the Tensor
-        inner_type = dtype[7:-1]
-        if inner_type.startswith("FP"):
-            return deserialize_tensor_fixed_point(serialized)
-        else: 
-            return deserialize_tensor_int(serialized)
-    pass
+            raise ValueError(f"Unsupported data type: {element_type}")
+
+    # Handle tuple data type
+    if dtype.startswith("(") and dtype.endswith(")"):
+        types = dtype[1:-1].split(", ")
+        if len(serialized) != len(types):
+            raise ValueError("Serialized data length does not match tuple length")
+
+        # Deserialize each element in the tuple according to its type
+        deserialized_elements = []
+        for i in range(len(serialized)):
+            ele = serialized[i]
+            ele_type = types[i]
+            deserialized_elements.append(deserialize_element([ele], ele_type))
+        return tuple(deserialized_elements)
+    else:
+        return deserialize_element(serialized, dtype)
 
 def deserializer(serialized: str, data_type: str, fp_impl='FP16x16'):
     """
@@ -182,89 +197,3 @@ def deserialize_tensor_fixed_point(serialized: list, impl='FP16x16') -> np.array
     return np.array(data, dtype=np.float64).reshape(shape)
 
 
-# ================= TUPLE UINT =================
-
-
-# def deserialize_tuple_uint(serialized: list):
-#     return np.array(serialized[0], dtype=np.int64)
-
-
-# # ================= TUPLE SIGNED INT =================
-
-
-# def deserialize_tuple_signed_int(serialized: list):
-#     num_ele = (len(serialized)) // 2
-
-#     deserialized_array = np.empty(num_ele, dtype=np.int64)
-
-#     for i in range(num_ele):
-#         deserialized_array[i] = deserialize_signed_int(
-#             serialized[i*2: 3 + i*2])
-
-#     return deserialized_array
-
-# # ================= TUPLE FIXED POINT =================
-
-
-# def deserialize_tuple_fixed_point(serialized: list, impl='FP16x16'):
-#     num_ele = (len(serialized)) // 2
-
-#     deserialized_array = np.empty(num_ele, dtype=np.float64)
-
-#     for i in range(num_ele):
-#         deserialized_array[i] = deserialize_fixed_point(
-#             serialized[i*2: 3 + i*2], impl)
-
-#     return deserialized_array
-
-
-# # ================= TUPLE TENSOR UINT =================
-
-# def deserialize_tuple_tensor_uint(serialized: list):
-#     return deserialize_tuple_tensor(serialized, deserialize_arr_uint)
-
-# # ================= TUPLE TENSOR SIGNED INT =================
-
-
-# def deserialize_tuple_tensor_signed_int(serialized: list):
-#     return deserialize_tuple_tensor(serialized, deserialize_arr_signed_int)
-
-# # ================= TUPLE TENSOR FIXED POINT =================
-
-
-# def deserialize_tuple_tensor_fixed_point(serialized: list, impl='FP16x16'):
-#     return deserialize_tuple_tensor(serialized, deserialize_arr_fixed_point, impl)
-
-
-# # ================= HELPERS =================
-
-
-# def extract_shape(serialized, start_index):
-#     """ Extracts the shape part of a tensor from a serialized list. """
-#     num_shape_elements = serialized[start_index]
-#     shape = serialized[start_index + 1: start_index + 1 + num_shape_elements]
-#     return shape, start_index + 1 + num_shape_elements
-
-
-# def extract_data(serialized, start_index, deserialization_func, impl=None):
-#     """ Extracts and deserializes the data part of a tensor from a serialized list. """
-#     num_data_elements = serialized[start_index]
-#     end_index = start_index + 1 + num_data_elements
-#     data_serialized = serialized[start_index: end_index]
-#     if impl:
-#         data = deserialization_func(data_serialized, impl)
-#     else:
-#         data = deserialization_func(data_serialized)
-#     return data, end_index
-
-
-# def deserialize_tuple_tensor(serialized, deserialization_func, impl=None):
-#     """ Generic deserialization function for a tuple of tensors. """
-#     deserialized_tensors = []
-#     i = 0
-#     while i < len(serialized):
-#         shape, i = extract_shape(serialized, i)
-#         data, i = extract_data(serialized, i, deserialization_func, impl)
-#         tensor = data.reshape(shape)
-#         deserialized_tensors.append(tensor)
-#     return tuple(deserialized_tensors)
