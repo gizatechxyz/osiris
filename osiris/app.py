@@ -96,21 +96,20 @@ def serialize(input_file: str, fp_impl: str = 'FP16x16'):
 
 
 @app.command()
-def deserialize(serialized: str, data_type: str, fp_impl: str = 'FP16x16'):
+def deserialize(serialized: str, data_type: str):
     """
     Deserialize a serialized string into a specific data type.
 
     Args:
     serialized (str): Serialized data in string format.
     data_type (str): The type of data to deserialize into.
-    fp_impl (str): Fixed-point implementation detail.
 
     Returns:
     Deserialized data.
     """
     typer.echo("🚀 Starting deserialization process...")
 
-    deserialized = deserializer(serialized, data_type, fp_impl)
+    deserialized = deserializer(serialized, data_type)
     typer.echo("✅ Deserialization completed! 🎉")
 
     return deserialized
