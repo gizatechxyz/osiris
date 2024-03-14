@@ -1,6 +1,5 @@
 import numpy as np
 import numpy.testing as npt
-import pytest
 from math import isclose
 
 from osiris.cairo.serde.deserialize import *
@@ -82,8 +81,8 @@ def test_deserialize_tuple_span_tensor_fp():
     npt.assert_array_equal(deserialized[0], expected[0])
     assert np.allclose(deserialized[1], expected[1], atol=1e-7)
 
-    # serialized = '[2 2] [2780037 0 2780037 0 2780037 1 2780037 1] [1 2]'
-    # deserialized = deserializer(serialized, '(Tensor<FP16x16>, Span<u32>)')
-    # expected = (np.array([[42.42, 42.42], [-42.42, -42.42]]), np.array([1, 2]))
-    # assert np.allclose(deserialized[0], expected[0], atol=1e-7)
-    # npt.assert_array_equal(deserialized[1], expected[1])
+    serialized = '[2 2] [2780037 0 2780037 0 2780037 1 2780037 1] [1 2]'
+    deserialized = deserializer(serialized, '(Tensor<FP16x16>, Span<u32>)')
+    expected = (np.array([[42.42, 42.42], [-42.42, -42.42]]), np.array([1, 2]))
+    assert np.allclose(deserialized[0], expected[0], atol=1e-7)
+    npt.assert_array_equal(deserialized[1], expected[1])
