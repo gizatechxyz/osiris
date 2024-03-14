@@ -10,7 +10,7 @@ def test_deserialize_int():
     deserialized = deserializer(serialized, 'u32')
     assert deserialized == 42
 
-    serialized = '-42'
+    serialized = '3618502788666131213697322783095070105623107215331596699973092056135872020439'
     deserialized = deserializer(serialized, 'i32')
     assert deserialized == -42
 
@@ -30,7 +30,7 @@ def test_deserialize_array_int():
     deserialized = deserializer(serialized, 'Span<u32>')
     assert np.array_equal(deserialized, np.array([1, 2], dtype=np.int64))
 
-    serialized = '[42 -42]'
+    serialized = '[42 3618502788666131213697322783095070105623107215331596699973092056135872020439]'
     deserialized = deserializer(serialized, 'Span<i32>')
     assert np.array_equal(deserialized, np.array([42, -42], dtype=np.int64))
 
@@ -48,7 +48,7 @@ def test_deserialize_tensor_int():
     assert np.array_equal(deserialized, np.array(
         ([1, 2], [3, 4]), dtype=np.int64))
 
-    serialized = '[2 2] [42 42 -42 -42]'
+    serialized = '[2 2] [42 42 3618502788666131213697322783095070105623107215331596699973092056135872020439 3618502788666131213697322783095070105623107215331596699973092056135872020439]'
     deserialized = deserializer(serialized, 'Tensor<i32>')
     assert np.array_equal(deserialized, np.array([[42, 42], [-42, -42]]))
 

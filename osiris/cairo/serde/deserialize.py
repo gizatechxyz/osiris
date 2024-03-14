@@ -1,22 +1,22 @@
 import numpy as np
-from math import isclose
 
+from osiris.cairo.serde.utils import felt_to_int, from_fp
 
 def deserializer(serialized, dtype):
-    if dtype in ['u32', 'i32']:
-        return int(serialized)
+    if dtype in ["u8", "u16", "u32", "u64", "u128", "i8", "i16", "i32", "i64", "i128"]:
+        return felt_to_int(int(serialized))
 
-    elif dtype == 'FP16x16':
+    elif dtype.startswith("FP"):
         parts = serialized.split()
-        value = int(parts[0]) / 2**16
+        value = from_fp(int(parts[0]))
         if len(parts) > 1 and parts[1] == '1':  # Check for negative sign
             value = -value
         return value
 
     elif dtype.startswith('Span<'):
         inner_type = dtype[5:-1]
-        if 'FP16x16' in inner_type:
-            # For FP16x16, elements consist of two parts (value and sign)
+        if inner_type.startswith("FP"):
+            # For fixed point, elements consist of two parts (value and sign)
             elements = serialized[1:-1].split()
             deserialized_elements = []
             for i in range(0, len(elements), 2):
@@ -31,9 +31,9 @@ def deserializer(serialized, dtype):
         inner_type = dtype[7:-1]
         parts = serialized.split('] [')
         dims = [int(d) for d in parts[0][1:].split()]
-        if 'FP16x16' in inner_type:
+        if inner_type.startswith("FP"):
             values = parts[1][:-1].split()  # Split the values normally first
-            # Now, process every two items (value and sign) as one FP16x16 element
+            # Now, process every two items (value and sign) as one fixed point element
             tensor_data = np.array([deserializer(
                 ' '.join(values[i:i+2]), inner_type) for i in range(0, len(values), 2)])
         else:
