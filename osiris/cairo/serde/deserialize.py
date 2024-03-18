@@ -1,5 +1,6 @@
-import numpy as np
 import re
+
+import numpy as np
 
 from osiris.cairo.serde.utils import felt_to_int, from_fp
 
