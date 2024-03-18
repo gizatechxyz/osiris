@@ -16,11 +16,11 @@ def test_deserialize_int():
 
 
 def test_deserialize_fp():
-    serialized = '2780037 0'
+    serialized = '2780037 false'
     deserialized = deserializer(serialized, 'FP16x16')
     assert isclose(deserialized, 42.42, rel_tol=1e-7)
 
-    serialized = '2780037 1'
+    serialized = '2780037 true'
     deserialized = deserializer(serialized, 'FP16x16')
     assert isclose(deserialized, -42.42, rel_tol=1e-7)
 
@@ -36,7 +36,7 @@ def test_deserialize_array_int():
 
 
 def test_deserialize_arr_fixed_point():
-    serialized = '[2780037 0 2780037 1]'
+    serialized = '[2780037 false 2780037 true]'
     deserialized = deserializer(serialized, 'Span<FP16x16>')
     expected = np.array([42.42, -42.42], dtype=np.float64)
     assert np.all(np.isclose(deserialized, expected, atol=1e-7))
@@ -54,11 +54,16 @@ def test_deserialize_tensor_int():
 
 
 def test_deserialize_tensor_fixed_point():
-    serialized = '[2 2] [2780037 0 2780037 0 2780037 1 2780037 1]'
+    serialized = '[2 2] [2780037 false 2780037 false 2780037 true 2780037 true]'
     expected_array = np.array([[42.42, 42.42], [-42.42, -42.42]])
     deserialized = deserializer(serialized, 'Tensor<FP16x16>')
     assert np.allclose(deserialized, expected_array, atol=1e-7)
 
+def test_deserialize_matrix_fixed_point():
+    serialized = "{0: 2780037 false 2: 2780037 false 1: 2780037 true 3: 2780037 true} 4 2 2"
+    expected_array = np.array([[42.42, 42.42], [-42.42, -42.42]])
+    deserialized = deserializer(serialized, 'MutMatrix<FP16x16>')
+    assert np.allclose(deserialized, expected_array, atol=1e-7)
 
 def test_deserialize_tuple_int():
     serialized = '1 3'
@@ -75,14 +80,21 @@ def test_deserialize_tuple_span():
 
 
 def test_deserialize_tuple_span_tensor_fp():
-    serialized = '[1 2] [2 2] [2780037 0 2780037 0 2780037 1 2780037 1]'
+    serialized = '[1 2] [2 2] [2780037 false 2780037 false 2780037 true 2780037 true]'
     deserialized = deserializer(serialized, '(Span<u32>, Tensor<FP16x16>)')
     expected = (np.array([1, 2]), np.array([[42.42, 42.42], [-42.42, -42.42]]))
     npt.assert_array_equal(deserialized[0], expected[0])
     assert np.allclose(deserialized[1], expected[1], atol=1e-7)
 
-    serialized = '[2 2] [2780037 0 2780037 0 2780037 1 2780037 1] [1 2]'
+    serialized = '[2 2] [2780037 false 2780037 false 2780037 true 2780037 true] [1 2]'
     deserialized = deserializer(serialized, '(Tensor<FP16x16>, Span<u32>)')
     expected = (np.array([[42.42, 42.42], [-42.42, -42.42]]), np.array([1, 2]))
     assert np.allclose(deserialized[0], expected[0], atol=1e-7)
     npt.assert_array_equal(deserialized[1], expected[1])
+
+def test_deserialize_tuple_matrix_fp():
+    serialized = '[1 2]{0: 2780037 false 2: 2780037 false 1: 2780037 true 3: 2780037 true} 4 2 2'
+    deserialized = deserializer(serialized, '(Span<u32>, MutMatrix<FP16x16>)')
+    expected = (np.array([1, 2]), np.array([[42.42, 42.42], [-42.42, -42.42]]))
+    npt.assert_array_equal(deserialized[0], expected[0])
+    assert np.allclose(deserialized[1], expected[1], atol=1e-7)
