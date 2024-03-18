@@ -31,7 +31,7 @@ def deserializer(serialized, dtype):
 def deserialize_fp(serialized):
     parts = serialized.split()
     value = from_fp(int(parts[0]))
-    if len(parts) > 1 and parts[1] == '1':  # Check for negative sign
+    if len(parts) > 1 and parts[1] == 'true':  # Check for negative sign
         value = -value
     return value
 
