@@ -59,6 +59,11 @@ def test_deserialize_tensor_fixed_point():
     deserialized = deserializer(serialized, 'Tensor<FP16x16>')
     assert np.allclose(deserialized, expected_array, atol=1e-7)
 
+def test_deserialize_matrix_fixed_point():
+    serialized = "{0: 2780037 false 2: 2780037 false 1: 2780037 true 3: 2780037 true} 4 2 2"
+    expected_array = np.array([[42.42, 42.42], [-42.42, -42.42]])
+    deserialized = deserializer(serialized, 'MutMatrix<FP16x16>')
+    assert np.allclose(deserialized, expected_array, atol=1e-7)
 
 def test_deserialize_tuple_int():
     serialized = '1 3'

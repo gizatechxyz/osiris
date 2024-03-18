@@ -1,4 +1,5 @@
 import numpy as np
+import re
 
 from osiris.cairo.serde.utils import felt_to_int, from_fp
 
@@ -16,6 +17,9 @@ def deserializer(serialized, dtype):
 
     elif dtype.startswith('Tensor<'):
         return deserialize_tensor(serialized, dtype)
+
+    elif dtype.startswith('MutMatrix<'):
+        return deserialize_matrix(serialized, dtype)
 
     elif dtype.startswith('('):  # Tuple
         return deserialize_tuple(serialized, dtype)
@@ -78,6 +82,30 @@ def deserialize_tuple(serialized, dtype):
         part1 = deserializer(serialized[:split_index].strip(), types[0])
         part2 = deserializer(serialized[split_index:].strip(), types[1])
     return part1, part2
+
+
+def deserialize_matrix(serialized, dtype):
+
+    # Extract inner dtype
+    pattern = r"<(.*)>"
+    inner_dtype = re.search(pattern, dtype).group(1)
+
+    # Extract the matrix content and shape from the serialized string
+    content, shape_str = serialized.split("} ")
+    # Last two numbers are the shape
+    shape = tuple(map(int, shape_str.split()[-2:]))
+
+    # Use regex to find all occurrences of ': ' followed by any characters until the next ' :' or end of string
+    pattern = r': (.*?)(?=\s\d+: |$)'
+    elements = re.findall(pattern, content)
+
+    # Deserialize each element using the appropriate deserializer based on dtype
+    deserialized_elements = [deserializer(
+        element, inner_dtype) for element in elements]
+
+    # Reshape the deserialized elements into a numpy array of the specified shape
+    matrix = np.array(deserialized_elements).reshape(shape)
+    return matrix
 
 
 def find_nth_occurrence(string, sub_string, n):
