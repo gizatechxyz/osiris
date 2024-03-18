@@ -64,24 +64,32 @@ def deserialize_tensor(serialized, dtype):
 
 def deserialize_tuple(serialized, dtype):
     types = dtype[1:-1].split(', ')
-    if 'Tensor' in types[0]:
-        tensor_end = find_nth_occurrence(serialized, ']', 2)
-        depth = 1
-        for i in range(tensor_end, len(serialized)):
-            if serialized[i] == '[':
-                depth += 1
-            elif serialized[i] == ']':
-                depth -= 1
-                if depth == 0:
-                    tensor_end = i + 1
-                    break
-        part1 = deserializer(serialized[:tensor_end].strip(), types[0])
-        part2 = deserializer(serialized[tensor_end:].strip(), types[1])
-    else:
-        split_index = serialized.find(']') + 2
+    # Check if there is no space between span and matrix.
+    is_no_space = re.search(r']\{', serialized)
+    if is_no_space:
+        split_index = is_no_space.start() + 1
         part1 = deserializer(serialized[:split_index].strip(), types[0])
         part2 = deserializer(serialized[split_index:].strip(), types[1])
-    return part1, part2
+        return part1, part2
+    else:
+        if 'Tensor' in types[0]:
+            tensor_end = find_nth_occurrence(serialized, ']', 2)
+            depth = 1
+            for i in range(tensor_end, len(serialized)):
+                if serialized[i] == '[':
+                    depth += 1
+                elif serialized[i] == ']':
+                    depth -= 1
+                    if depth == 0:
+                        tensor_end = i + 1
+                        break
+            part1 = deserializer(serialized[:tensor_end].strip(), types[0])
+            part2 = deserializer(serialized[tensor_end:].strip(), types[1])
+        else:
+            split_index = serialized.find(']') + 2
+            part1 = deserializer(serialized[:split_index].strip(), types[0])
+            part2 = deserializer(serialized[split_index:].strip(), types[1])
+        return part1, part2
 
 
 def deserialize_matrix(serialized, dtype):

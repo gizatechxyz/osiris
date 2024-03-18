@@ -91,3 +91,10 @@ def test_deserialize_tuple_span_tensor_fp():
     expected = (np.array([[42.42, 42.42], [-42.42, -42.42]]), np.array([1, 2]))
     assert np.allclose(deserialized[0], expected[0], atol=1e-7)
     npt.assert_array_equal(deserialized[1], expected[1])
+
+def test_deserialize_tuple_matrix_fp():
+    serialized = '[1 2]{0: 2780037 false 2: 2780037 false 1: 2780037 true 3: 2780037 true} 4 2 2'
+    deserialized = deserializer(serialized, '(Span<u32>, MutMatrix<FP16x16>)')
+    expected = (np.array([1, 2]), np.array([[42.42, 42.42], [-42.42, -42.42]]))
+    npt.assert_array_equal(deserialized[0], expected[0])
+    assert np.allclose(deserialized[1], expected[1], atol=1e-7)
