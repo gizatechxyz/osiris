@@ -109,20 +109,21 @@ def serialize(input_file: str, framework='ONNX_ORION'):
 
 
 @app.command()
-def deserialize(serialized: str, data_type: str):
+def deserialize(serialized: str, data_type: str, framework='ONNX_ORION'):
     """
     Deserialize a serialized string into a specific data type.
 
     Args:
     serialized (str): Serialized data in string format.
     data_type (str): The type of data to deserialize into.
+    framework (str): Context of the framework used.
 
     Returns:
     Deserialized data.
     """
     typer.echo("🚀 Starting deserialization process...")
 
-    deserialized = deserializer(serialized, data_type)
+    deserialized = deserializer(serialized, data_type, framework)
     typer.echo("✅ Deserialization completed! 🎉")
 
     return deserialized
