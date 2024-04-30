@@ -13,6 +13,7 @@ from osiris.dtypes.input_output_formats import InputFormat, OutputFormat
 
 app = typer.Typer()
 
+
 def check_file_format(file_path):
     _, file_extension = os.path.splitext(file_path)
 
@@ -67,13 +68,13 @@ def convert_to_numpy(data):
 
 
 @app.command()
-def serialize(input_file: str, fp_impl: str = 'FP16x16'):
+def serialize(input_file: str, framework='ONNX_ORION'):
     """
     Serialize data from a file to a tensor representation.
 
     Args:
     input_file (str): The path to the input file.
-    fp_impl (str): Fixed-point implementation detail.
+    framework (str): Context of the framework used.
 
     Returns:
     Serialized tensor.
@@ -86,8 +87,20 @@ def serialize(input_file: str, fp_impl: str = 'FP16x16'):
     numpy_array = convert_to_numpy(data)
     typer.echo("✅ Conversion to numpy completed!")
 
-    tensor = create_tensor_from_array(numpy_array, fp_impl)
-    typer.echo("✅ Conversion to tensor completed!")
+    match framework:
+        case 'ONNX_ORION':
+            tensor = create_tensor_from_array(numpy_array, 'FP16x16')
+            typer.echo("✅ Conversion to tensor completed!")
+        case 'XGB':
+            numpy_array *= 100000
+            tensor = numpy_array.astype(np.int64)
+        case 'LGBM':
+            numpy_array *= 100000
+            tensor = numpy_array.astype(np.int64)
+        case _:
+            tensor = create_tensor_from_array(
+                numpy_array, 'FP16x16')
+            typer.echo("✅ Conversion to tensor completed!")
 
     serialized = serializer(tensor)
     typer.echo("✅ Serialized tensor successfully! 🎉")

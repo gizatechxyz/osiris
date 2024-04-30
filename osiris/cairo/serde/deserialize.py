@@ -5,10 +5,17 @@ import numpy as np
 from osiris.cairo.serde.utils import felt_to_int, from_fp
 
 
-def deserializer(serialized, dtype):
+def deserializer(serialized, dtype, framework='ONNX_ORION'):
 
     if dtype in ["u8", "u16", "u32", "u64", "u128", "i8", "i16", "i32", "i64", "i128"]:
-        return felt_to_int(int(serialized))
+
+        match framework:
+            case 'XGB':
+                return felt_to_int(int(serialized)) / 100000
+            case 'LGBM':
+                return felt_to_int(int(serialized)) / 100000
+            case _:
+                return felt_to_int(int(serialized))
 
     elif dtype.startswith("FP"):
         return deserialize_fp(serialized)
