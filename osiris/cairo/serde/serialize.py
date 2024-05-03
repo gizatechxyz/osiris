@@ -4,7 +4,7 @@ from osiris.cairo.serde.data_structures import (
     Tensor,
 )
 from osiris.cairo.serde.utils import int_to_felt
-
+import numpy as np
 
 def serializer(data):
     if isinstance(data, bool):
@@ -16,10 +16,11 @@ def serializer(data):
     elif isinstance(data, (list, tuple)):
         joined_elements = ' '.join(serializer(e) for e in data)
         return f"[{joined_elements}]"
+    elif isinstance(data, np.ndarray):
+        return f"{serializer(data.tolist())}"
     elif isinstance(data, Tensor):
         return f"{serializer(data.shape)} {serializer(data.data)}"
     elif isinstance(data, FixedPoint):
         return f"{serializer(data.mag)} {serializer(data.sign)}"
-
     else:
         raise ValueError("Unsupported data type for serialization")
