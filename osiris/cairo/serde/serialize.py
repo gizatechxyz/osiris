@@ -1,10 +1,12 @@
+import numpy as np
+
 from osiris.cairo.serde.data_structures import (
     FixedPoint,
     Int,
     Tensor,
 )
 from osiris.cairo.serde.utils import int_to_felt
-import numpy as np
+
 
 def serializer(data):
     if isinstance(data, bool):
